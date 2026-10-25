@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Riff</title>
+  
+  <meta property="og:site_name" content="Riff">
+  <meta property="og:type" content="music.song">
+  <meta property="og:title" id="ogTitle" content="Riff">
+  <meta property="og:description" id="ogDesc" content="Listen on Riff">
+  <meta property="og:image" id="ogImage" content="https://raw.githubusercontent.com/rootscripts/fork/refs/heads/main/riff.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="twTitle" content="Riff">
+  <meta name="twitter:description" id="twDesc" content="Listen on Riff">
+  <meta name="twitter:image" id="twImage" content="https://raw.githubusercontent.com/rootscripts/fork/refs/heads/main/riff.svg">
+  <meta name="theme-color" content="#d0bcff">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&family=Google+Sans+Text:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #121214;
+      --surface: #1e1f22;
+      --surface-high: #28292c;
+      --surface-highest: #333438;
+      --primary: #d0bcff;
+      --on-primary: #381e72;
+      --primary-container: #4f378b;
+      --on-primary-container: #eaddff;
+      --on-surface: #e6e6e8;
+      --on-surface-variant: #cac4d0;
+      --outline: #938f99;
+      --outline-variant: #49454f;
+      --accent: var(--primary);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Google Sans', 'Google Sans Text', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--on-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      transition: background-color 0.45s ease, color 0.45s ease;
+    }
+
+    .top-banner {
+      width: 100%;
+      height: 40px;
+      flex-shrink: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 0 20px;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      transition: background-color 0.2s ease;
+    }
+
+    .top-banner:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .top-banner svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 2.2;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(840px, 94vw);
+      height: min(600px, 70vh);
+      background: var(--accent);
+      filter: blur(140px) saturate(2.4);
+      opacity: 0.42;
+      pointer-events: none !important;
+      z-index: 0;
+      border-radius: 50%;
+      transition: background-color 0.6s ease, opacity 0.6s ease;
+    }
+
+    .main-wrap {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(6px, 1.4vh, 16px) 20px clamp(12px, 2vh, 20px) 20px;
+      gap: clamp(8px, 1.4vh, 16px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .center-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      gap: 28px;
+    }
+
+    .m3-cover-stage {
+      position: relative;
+      width: clamp(260px, 50vh, 440px);
+      height: clamp(260px, 50vh, 440px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      flex-shrink: 0;
+      transition: width 0.35s cubic-bezier(0.2, 0, 0, 1), height 0.35s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .m3-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .lyrics-container {
+      display: none;
+      position: relative;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      flex: 1;
+      max-width: 440px;
+      height: 100%;
+      max-height: clamp(260px, 50vh, 440px);
+      padding: 16px 10px;
+      box-sizing: border-box;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+      scroll-behavior: auto;
+      scrollbar-width: none;
+    }
+
+    .lyrics-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .main-wrap.show-lyrics .lyrics-container {
+      display: flex;
+    }
+
+    .main-wrap.show-lyrics .m3-cover-stage {
+      width: clamp(180px, 32vh, 260px);
+      height: clamp(180px, 32vh, 260px);
+    }
+
+    @media (max-width: 760px) {
+      .main-wrap.show-lyrics .center-stage {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .main-wrap.show-lyrics .m3-cover-stage {
+        width: 110px;
+        height: 110px;
+      }
+      .main-wrap.show-lyrics .lyrics-container {
+        max-height: clamp(160px, 32vh, 280px);
+        width: 100%;
+      }
+    }
+
+    .lyric-line {
+      font-size: clamp(16px, 2.2vh, 20px);
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 12px;
+      width: 100%;
+      box-sizing: border-box;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      opacity: max(.25, calc(1 - var(--dist, 0) * .2));
+      filter: blur(calc(min(var(--dist, 0), 4) * .8px));
+      transition: opacity 0.45s cubic-bezier(0.722, 0.679, 0, 1.008), filter 0.45s cubic-bezier(0.722, 0.679, 0, 1.008), transform 0.45s cubic-bezier(0.722, 0.679, 0, 1.008), color 0.2s ease;
+    }
+
+    .lyric-line:hover {
+      opacity: 1;
+      filter: none;
+      color: var(--on-surface);
+    }
+
+    .lyric-line.active {
+      color: var(--on-surface) !important;
+      font-weight: 700;
+      opacity: 1;
+      filter: none;
+      transform: scale(1.02);
+    }
+
+    .track-meta-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      max-width: 100%;
+    }
+
+    .track-title {
+      font-size: clamp(20px, 3vh, 32px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--on-surface);
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: clamp(14px, 1.8vh, 17px);
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .scrubber-row {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .time-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--outline);
+      font-variant-numeric: tabular-nums;
+      width: 38px;
+      user-select: none;
+    }
+
+    .sl {
+      --v: 0;
+      position: relative;
+      width: 100%;
+      height: 20px;
+      flex: 1 1 auto;
+    }
+
+    .sl-active,
+    .sl-inactive {
+      position: absolute;
+      top: 4px;
+      height: 12px;
+      pointer-events: none;
+      transition: background-color 0.25s ease;
+    }
+
+    .sl-active {
+      left: 0;
+      width: max(0px, calc((100% - 5px) * var(--v) + 2.5px - 6px));
+      background: var(--primary);
+      border-radius: 6px 2px 2px 6px;
+    }
+
+    .sl-inactive {
+      right: 0;
+      width: max(0px, calc(100% - ((100% - 5px) * var(--v) + 2.5px) - 6px));
+      background: color-mix(in srgb, var(--on-surface) 16%, transparent);
+      border-radius: 2px 6px 6px 2px;
+    }
+
+    .sl input[type="range"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .sl input[type="range"]::-webkit-slider-runnable-track {
+      height: 20px;
+      background: transparent;
+    }
+
+    .sl input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 5px;
+      height: 20px;
+      border-radius: 2.5px;
+      background: var(--primary);
+      border: none;
+      box-shadow: none;
+      transform: none;
+      transition: width 0.15s ease, background-color 0.25s ease;
+    }
+
+    .sl input[type="range"]:active::-webkit-slider-thumb {
+      width: 3px;
+      transform: none;
+    }
+
+    .sl input[type="range"]::-moz-range-track {
+      height: 20px;
+      background: transparent;
+    }
+
+    .sl input[type="range"]::-moz-range-thumb {
+      width: 5px;
+      height: 20px;
+      border-radius: 2.5px;
+      background: var(--primary);
+      border: none;
+      box-shadow: none;
+      cursor: pointer;
+      transition: width 0.15s ease, background-color 0.25s ease;
+    }
+
+    .sl input[type="range"]:active::-moz-range-thumb {
+      width: 3px;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .btn-play {
+      position: relative;
+      z-index: 10;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--on-primary);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.15s ease, filter 0.15s ease, background-color 0.3s ease, color 0.3s ease, border-radius 0.2s ease;
+    }
+
+    .btn-play.playing {
+      border-radius: 18px;
+    }
+
+    .btn-play:hover {
+      transform: scale(1.06);
+      filter: brightness(1.08);
+    }
+
+    .btn-play:active {
+      transform: scale(0.95);
+    }
+
+    .btn-play svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      pointer-events: none !important;
+    }
+
+    .btn-spinner {
+      width: 22px;
+      height: 22px;
+      animation: spin 1.2s linear infinite;
+      fill: none !important;
+      stroke: currentColor;
+      stroke-width: 4.5;
+      stroke-linecap: round;
+    }
+
+    .btn-spinner circle {
+      stroke-dasharray: 80, 200;
+      stroke-dashoffset: 0;
+      animation: dash 1.4s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes dash {
+      0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+      50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; }
+      100% { stroke-dasharray: 90, 200; stroke-dashoffset: -125px; }
+    }
+
+    .btn-icon {
+      position: relative;
+      z-index: 10;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface-high);
+      color: var(--on-surface-variant);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-icon:hover {
+      background: var(--surface-highest);
+      color: var(--on-surface);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.94);
+    }
+
+    .btn-icon.active {
+      background: var(--primary) !important;
+      color: var(--on-primary) !important;
+    }
+
+    .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      pointer-events: none !important;
+    }
+
+    .volume-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 120px;
+    }
+
+    .hidden-player {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0.001;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .controls-row {
+        gap: 12px;
+      }
+      .volume-group {
+        width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="https://github.com/rootscripts/riff" target="_blank" rel="noopener" class="top-banner">
+    <span>Download Riff — your best music app on your device.</span>
+    <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </a>
+
+  <div class="hero-glow" id="heroGlow"></div>
+
+  <main class="main-wrap" id="mainWrap">
+    <div class="center-stage">
+      <div class="m3-cover-stage">
+        <canvas id="m3CoverCanvas" class="m3-canvas"></canvas>
+      </div>
+      <div class="lyrics-container" id="lyricsContainer"></div>
+    </div>
+
+    <div class="track-meta-block">
+      <h1 class="track-title" id="trackTitle">Loading...</h1>
+      <div class="track-artist" id="trackArtist"></div>
+    </div>
+
+    <div class="scrubber-row">
+      <span class="time-label" id="currentTime">0:00</span>
+      <div class="sl" id="seekSlWrap">
+        <div class="sl-active" id="seekSlActive"></div>
+        <div class="sl-inactive" id="seekSlInactive"></div>
+        <input type="range" class="pill-range" id="seekSlider" min="0" max="100" value="0">
+      </div>
+      <span class="time-label" id="totalDuration">0:00</span>
+    </div>
+
+    <div class="controls-row">
+      <div class="volume-group">
+        <button class="btn-icon" id="btnMute" title="Mute">
+          <svg id="volumeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <div class="sl" id="volSlWrap">
+          <div class="sl-active" id="volSlActive"></div>
+          <div class="sl-inactive" id="volSlInactive"></div>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.9">
+        </div>
+      </div>
+
+      <button class="btn-play" id="btnPlay" title="Play">
+        <svg id="playIcon" viewBox="0 0 24 24"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+        <svg id="pauseIcon" style="display:none;" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        <svg id="spinIcon" class="btn-spinner" style="display:none;" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/></svg>
+      </button>
+
+      <button class="btn-icon" id="btnLyrics" title="Lyrics" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </button>
+
+      <button class="btn-icon" id="btnCopyLink" title="Copy share link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 14 20 9 15 4"></polyline>
+          <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <audio id="nativeAudio" class="hidden-player" preload="metadata"></audio>
+  <div id="youtubePlayerHost" class="hidden-player"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    (function () {
+      const K = 360;
+      const R = 160;
+      const TAU = Math.PI * 2;
+      const DEG = Math.PI / 180;
+
+      const DEFS = [
+        {
+          kind: "cookie",
+          petals: 7,
+          center: [160, 608.78580952],
+          stretch: 1.00227424,
+          rim: [154.0236, 15.1787],
+          handle: [167.8238, 5.6686],
+          f1: [[153.2414, 15.8961], [152.2361, 16.7034], [150.3202, 18.3516]],
+          f2: [[149.7071, 18.9139], [149.4061, 19.195], [149.1302, 19.4773]],
+          vh: [145.6613, 23.5231]
+        },
+        {
+          kind: "cookie",
+          petals: 9,
+          center: [1503, 163.34198056],
+          stretch: 1.01036691,
+          rim: [154.3557, 11.7227],
+          handle: [165.6694, 4.4348],
+          f1: [[153.9368, 12.0547], [153.4294, 12.4257], [152.4353, 13.1735]],
+          f2: [[151.9994, 13.5097], [151.7843, 13.6784], [151.5812, 13.8451]],
+          vh: [147.3456, 17.7843]
+        },
+        {
+          kind: "cookie",
+          petals: 12,
+          center: [1974, 604.001],
+          stretch: 1,
+          rim: [152.8016, 8.376],
+          handle: [163.2344, 3.4256],
+          f1: [[152.6152, 8.4738], [152.3933, 8.5891], [151.9524, 8.8207]],
+          f2: [[151.6913, 8.9609], [151.5576, 9.0305], [151.4338, 9.0971]],
+          vh: [145.4447, 12.6887]
+        },
+        {
+          kind: "clover",
+          center: [1066.99925, 604.003],
+          os: [38.73, -133.7908],
+          oh: [98.8705, -159.911],
+          is: [129.471, -28.79],
+          ih: [121.4998, -10.42]
+        }
+      ];
+
+      function bezPt(c, t) {
+        const u = 1 - t;
+        const a = u * u * u;
+        const b = 3 * u * u * t;
+        const d = 3 * u * t * t;
+        const e = t * t * t;
+        return [
+          a * c[0][0] + b * c[1][0] + d * c[2][0] + e * c[3][0],
+          a * c[0][1] + b * c[1][1] + d * c[2][1] + e * c[3][1]
+        ];
+      }
+
+      function segLine(a, b) {
+        const dx = (b[0] - a[0]) / 3;
+        const dy = (b[1] - a[1]) / 3;
+        return [a, [a[0] + dx, a[1] + dy], [a[0] + 2 * dx, a[1] + 2 * dy], b];
+      }
+
+      function polar(c, st, r, ang) {
+        return [c[0] + r * Math.cos(ang), c[1] + st * r * Math.sin(ang)];
+      }
+
+      function wrapAng(d) {
+        let r = d % TAU;
+        if (r > Math.PI) r -= TAU;
+        if (r <= -Math.PI) r += TAU;
+        return r;
+      }
+
+      function mkCookie(d) {
+        const step = TAU / d.petals;
+        const out = [];
+        for (let i = 0; i < d.petals; i++) {
+          const base = -Math.PI / 2 + i * step;
+          const p = (pt) => polar(d.center, d.stretch, pt[0], base + pt[1] * DEG);
+          const pm = (pt) => polar(d.center, d.stretch, pt[0], base + step - pt[1] * DEG);
+          const pl = (pt) => p([pt[0], -pt[1]]);
+          const e1 = d.f1[2];
+          const e2 = d.f2[2];
+          out.push([pl(d.rim), pl(d.handle), p(d.handle), p(d.rim)]);
+          out.push([p(d.rim), p(d.f1[0]), p(d.f1[1]), p(e1)]);
+          out.push([p(e1), p(d.f2[0]), p(d.f2[1]), p(e2)]);
+          out.push([p(e2), p(d.vh), pm(d.vh), pm(e2)]);
+          out.push([pm(e2), pm(d.f2[1]), pm(d.f2[0]), pm(e1)]);
+          out.push([pm(e1), pm(d.f1[1]), pm(d.f1[0]), pm(d.rim)]);
+        }
+        return out;
+      }
+
+      function mkClover(d) {
+        const out = [];
+        const rotQ = (pt, q) => {
+          let x = pt[0], y = pt[1];
+          for (let s = 0; s < q; s++) { const tx = -y; y = x; x = tx; }
+          return [d.center[0] + x, d.center[1] + y];
+        };
+        for (let q = 0; q < 4; q++) {
+          const p = (pt) => rotQ(pt, q);
+          const oa = [p(d.os), p(d.oh), p([-d.oh[1], -d.oh[0]]), p([-d.os[1], -d.os[0]])];
+          const ia = [p(d.is), p(d.ih), p([d.ih[0], -d.ih[1]]), p([d.is[0], -d.is[1]])];
+          const next = rotQ(d.os, q + 1);
+          out.push(oa, segLine(oa[3], ia[0]), ia, segLine(ia[3], next));
+        }
+        return out;
+      }
+
+      function curveBbox(c) {
+        const b = [Infinity, Infinity, -Infinity, -Infinity];
+        const add = (p) => {
+          b[0] = Math.min(b[0], p[0]); b[1] = Math.min(b[1], p[1]);
+          b[2] = Math.max(b[2], p[0]); b[3] = Math.max(b[3], p[1]);
+        };
+        add(c[0]); add(c[3]);
+        for (let ax = 0; ax < 2; ax++) {
+          const d1 = c[1][ax] - c[0][ax];
+          const d2 = c[2][ax] - c[1][ax];
+          const d3 = c[3][ax] - c[2][ax];
+          const A = d1 - 2 * d2 + d3;
+          const B = 2 * (d2 - d1);
+          const C = d1;
+          const roots = [];
+          if (Math.abs(A) < 1e-12) {
+            if (Math.abs(B) > 1e-12) roots.push(-C / B);
+          } else {
+            const disc = B * B - 4 * A * C;
+            if (disc >= 0) {
+              const sq = Math.sqrt(disc);
+              roots.push((-B + sq) / (2 * A), (-B - sq) / (2 * A));
+            }
+          }
+          roots.forEach((t) => { if (t > 0 && t < 1) add(bezPt(c, t)); });
+        }
+        return b;
+      }
+
+      function getCenter(out) {
+        const tot = [Infinity, Infinity, -Infinity, -Infinity];
+        out.forEach((c) => {
+          const b = curveBbox(c);
+          tot[0] = Math.min(tot[0], b[0]); tot[1] = Math.min(tot[1], b[1]);
+          tot[2] = Math.max(tot[2], b[2]); tot[3] = Math.max(tot[3], b[3]);
+        });
+        return [(tot[0] + tot[2]) / 2, (tot[1] + tot[3]) / 2];
+      }
+
+      function angTo(pt, c) {
+        return Math.atan2(pt[1] - c[1], pt[0] - c[0]);
+      }
+
+      function mkSects(out, c) {
+        const res = [];
+        let a = angTo(out[0][0], c);
+        out.forEach((curve) => {
+          const s = a;
+          const e = s + wrapAng(angTo(curve[3], c) - s);
+          res.push({ curve, s, e });
+          a = e;
+        });
+        return res;
+      }
+
+      function sampleRad(sects, c, ang) {
+        const a0 = sects[0].s;
+        const tgt = a0 + ((((ang - a0) % TAU) + TAU) % TAU);
+        let sec = sects[sects.length - 1];
+        for (let i = 0; i < sects.length; i++) {
+          if (tgt >= sects[i].s && tgt <= sects[i].e) { sec = sects[i]; break; }
+        }
+        let lo = 0, hi = 1;
+        for (let i = 0; i < 56; i++) {
+          const mid = (lo + hi) / 2;
+          const pt = bezPt(sec.curve, mid);
+          const pa = sec.s + wrapAng(angTo(pt, c) - sec.s);
+          if (pa < tgt) lo = mid; else hi = mid;
+        }
+        const pt = bezPt(sec.curve, (lo + hi) / 2);
+        return Math.hypot(pt[0] - c[0], pt[1] - c[1]);
+      }
+
+      function buildProf(d) {
+        const out = d.kind === "clover" ? mkClover(d) : mkCookie(d);
+        const c = getCenter(out);
+        let sects = mkSects(out, c);
+        if (sects[sects.length - 1].e - sects[0].s < 0) {
+          sects = mkSects(out.slice().reverse().map((cv) => cv.slice().reverse()), c);
+        }
+        const rads = new Float32Array(K);
+        let maxR = 0;
+        for (let i = 0; i < K; i++) {
+          const a = -Math.PI + (TAU * i) / K;
+          rads[i] = sampleRad(sects, c, a);
+          if (rads[i] > maxR) maxR = rads[i];
+        }
+        const sc = R / maxR;
+        for (let i = 0; i < K; i++) rads[i] *= sc;
+        return rads;
+      }
+
+      const profs = DEFS.map(buildProf);
+      const hist = [0];
+
+      function nextShape(cur) {
+        if (cur !== undefined && hist[hist.length - 1] !== cur) hist.push(cur);
+        const rec = hist.slice(-2);
+        const opts = profs.map((_, i) => i).filter((i) => !rec.includes(i));
+        const pick = opts.length ? opts[Math.floor(Math.random() * opts.length)] : 0;
+        hist.push(pick);
+        if (hist.length > 10) hist.shift();
+        return pick;
+      }
+
+      window.RiffShapes = {
+        K,
+        HOLD_MS: 2400,
+        MORPH_MS: 1300,
+        ease: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+        ready: () => profs.length > 0,
+        profile: (i) => profs[i],
+        next: nextShape
+      };
+    })();
+
+    function drawCookie8(ctx, cx, cy, r) {
+      const n = 8;
+      const step = (Math.PI * 2) / n;
+      const ro = r;
+      const ri = r * 0.82;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const a0 = i * step - Math.PI / 2;
+        const aMid = a0 + step * 0.5;
+        const aNext = a0 + step;
+        const cp1x = cx + ro * 1.06 * Math.cos(a0 + step * 0.2);
+        const cp1y = cy + ro * 1.06 * Math.sin(a0 + step * 0.2);
+        const mx = cx + ro * Math.cos(aMid);
+        const my = cy + ro * Math.sin(aMid);
+        const cp2x = cx + ro * 1.06 * Math.cos(a0 + step * 0.8);
+        const cp2y = cy + ro * 1.06 * Math.sin(a0 + step * 0.8);
+        const ex = cx + ri * Math.cos(aNext);
+        const ey = cy + ri * Math.sin(aNext);
+        if (i === 0) ctx.moveTo(cx + ri * Math.cos(a0), cy + ri * Math.sin(a0));
+        ctx.quadraticCurveTo(cp1x, cp1y, mx, my);
+        ctx.quadraticCurveTo(cp2x, cp2y, ex, ey);
+      }
+      ctx.closePath();
+    }
+
+    function genOg(imgUrl) {
+      if (!imgUrl) return;
+      const proxy = `https://wsrv.nl/?url=${encodeURIComponent(imgUrl)}&w=800&h=800&fit=cover&output=jpg`;
+      const baseImg = new Image();
+      baseImg.crossOrigin = 'Anonymous';
+      baseImg.onload = () => {
+        const oc = document.createElement('canvas');
+        oc.width = 800;
+        oc.height = 800;
+        const octx = oc.getContext('2d');
+        const iw = baseImg.naturalWidth, ih = baseImg.naturalHeight;
+        const s = Math.min(iw, ih);
+        octx.drawImage(baseImg, (iw - s) / 2, (ih - s) / 2, s, s, 0, 0, 800, 800);
+
+        const cr = 72;
+        const cx = cr + 36;
+        const cy = 800 - cr - 36;
+
+        octx.save();
+        octx.shadowColor = 'rgba(0,0,0,0.45)';
+        octx.shadowBlur = 24;
+        octx.shadowOffsetY = 6;
+        octx.fillStyle = '#ffffff';
+        drawCookie8(octx, cx, cy, cr);
+        octx.fill();
+        octx.restore();
+
+        const logo = new Image();
+        logo.crossOrigin = 'Anonymous';
+        logo.onload = () => {
+          const isz = 82;
+          const ic = document.createElement('canvas');
+          ic.width = isz;
+          ic.height = isz;
+          const ictx = ic.getContext('2d');
+          ictx.drawImage(logo, 0, 0, isz, isz);
+          ictx.globalCompositeOperation = 'source-in';
+          ictx.fillStyle = '#000000';
+          ictx.fillRect(0, 0, isz, isz);
+
+          octx.drawImage(ic, cx - isz / 2, cy - isz / 2);
+
+          try {
+            const dataUrl = oc.toDataURL('image/jpeg', 0.92);
+            const og = document.getElementById('ogImage');
+            const tw = document.getElementById('twImage');
+            if (og) og.content = dataUrl;
+            if (tw) tw.content = dataUrl;
+          } catch {}
+        };
+        logo.src = 'https://raw.githubusercontent.com/rootscripts/fork/refs/heads/main/riff.svg';
+      };
+      baseImg.src = proxy;
+    }
+
+    function toHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      let h = 0, s = 0, l = (mx + mn) / 2;
+      if (mx !== mn) {
+        const d = mx - mn;
+        s = l > 0.5 ? d / (2 - mx - mn) : d / (max + min);
+        if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (mx === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+      }
+      return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+    }
+
+    function setTheme(h, s) {
+      const k = Math.min(1, Math.max(0, s / 85));
+      const pSat = Math.round(18 + k * 74);
+      const bgSat = Math.round(k * 36);
+
+      const pri = `hsl(${h}, ${pSat}%, 78%)`;
+      const onPri = `hsl(${h}, ${Math.min(100, pSat)}%, 16%)`;
+      const priCont = `hsl(${h}, ${Math.round(pSat * 0.75)}%, 30%)`;
+      const onPriCont = `hsl(${h}, ${pSat}%, 92%)`;
+      const bg = `hsl(${h}, ${bgSat}%, 8%)`;
+      const surf = `hsl(${h}, ${bgSat}%, 12%)`;
+      const surfHi = `hsl(${h}, ${bgSat}%, 17%)`;
+      const surfMax = `hsl(${h}, ${bgSat}%, 22%)`;
+      const onSurf = `hsl(${h}, ${Math.round(bgSat * 0.6)}%, 93%)`;
+      const onSurfVar = `hsl(${h}, ${Math.round(bgSat * 0.7)}%, 78%)`;
+      const outl = `hsl(${h}, ${Math.round(bgSat * 0.5)}%, 58%)`;
+
+      const st = document.documentElement.style;
+      st.setProperty('--primary', pri);
+      st.setProperty('--on-primary', onPri);
+      st.setProperty('--primary-container', priCont);
+      st.setProperty('--on-primary-container', onPriCont);
+      st.setProperty('--bg', bg);
+      st.setProperty('--surface', surf);
+      st.setProperty('--surface-high', surfHi);
+      st.setProperty('--surface-highest', surfMax);
+      st.setProperty('--on-surface', onSurf);
+      st.setProperty('--on-surface-variant', onSurfVar);
+      st.setProperty('--outline', outl);
+      st.setProperty('--accent', pri);
+
+      heroGlow.style.background = pri;
+      heroGlow.style.opacity = String((0.22 + k * 0.28).toFixed(2));
+    }
+
+    function getColors(img) {
+      const c = document.createElement('canvas');
+      c.width = 48;
+      c.height = 48;
+      const x = c.getContext('2d');
+      try {
+        x.drawImage(img, 0, 0, 48, 48);
+        const px = x.getImageData(0, 0, 48, 48).data;
+        const bins = Array.from({ length: 24 }, () => ({ w: 0 }));
+        let colored = 0, bestW = 0, bestIdx = -1;
+
+        for (let i = 0; i < px.length; i += 4) {
+          if (px[i + 3] < 128) continue;
+          const [h, s, l] = toHsl(px[i], px[i + 1], px[i + 2]);
+          if (l >= 10 && l <= 90 && s >= 10) {
+            colored++;
+            const idx = Math.min(23, Math.floor(h / 15));
+            const w = (s / 100) * (1 - Math.abs(l - 50) / 55);
+            bins[idx].w += Math.max(0.1, w);
+            if (bins[idx].w > bestW) {
+              bestW = bins[idx].w;
+              bestIdx = idx;
+            }
+          }
+        }
+
+        if (bestIdx !== -1 && colored > 20) {
+          let hSum = 0, sSum = 0, n = 0;
+          for (let i = 0; i < px.length; i += 4) {
+            const [h, s, l] = toHsl(px[i], px[i + 1], px[i + 2]);
+            if (l >= 10 && l <= 90 && s >= 10 && Math.min(23, Math.floor(h / 15)) === bestIdx) {
+              hSum += h; sSum += s; n++;
+            }
+          }
+          setTheme(n ? Math.round(hSum / n) : 270, n ? Math.round(sSum / n) : 70);
+          return true;
+        }
+        setTheme(270, 8);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function dec(s) {
+      if (!s) return '';
+      try { return decodeURIComponent(s.replace(/\+/g, ' ')).trim(); }
+      catch { return s.replace(/\+/g, ' ').trim(); }
+    }
+
+    function parseUrl() {
+      const q = (window.location.search || window.location.hash || '').replace(/^[?#]/, '');
+      const map = new Map();
+      for (const part of q.split(/[?&]/)) {
+        if (!part) continue;
+        const eq = part.indexOf('=');
+        if (eq !== -1) map.set(dec(part.slice(0, eq)), dec(part.slice(eq + 1)));
+      }
+      return {
+        type: map.get('t') || 'music',
+        title: map.get('n') || '',
+        artist: map.get('a') || '',
+        streamUrl: map.get('stream') || '',
+        mediaUrl: map.get('url') || '',
+        image: map.get('img') || '',
+        duration: parseInt(map.get('dur') || '0', 10)
+      };
+    }
+
+    function fmtTime(sec) {
+      if (!sec || isNaN(sec) || sec < 0) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    const info = parseUrl();
+
+    const titleEl = document.getElementById('trackTitle');
+    const artistEl = document.getElementById('trackArtist');
+    const pageTitle = document.getElementById('pageTitle');
+    const heroGlow = document.getElementById('heroGlow');
+    const mainWrap = document.getElementById('mainWrap');
+
+    const audio = document.getElementById('nativeAudio');
+    const btnPlay = document.getElementById('btnPlay');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const spinIcon = document.getElementById('spinIcon');
+    const btnLyrics = document.getElementById('btnLyrics');
+    const lrcContainer = document.getElementById('lyricsContainer');
+    const seekSlider = document.getElementById('seekSlider');
+    const seekWrap = document.getElementById('seekSlWrap');
+    const curTimeEl = document.getElementById('currentTime');
+    const durTimeEl = document.getElementById('totalDuration');
+    const volSlider = document.getElementById('volumeSlider');
+    const volWrap = document.getElementById('volSlWrap');
+    const btnMute = document.getElementById('btnMute');
+    const btnCopy = document.getElementById('btnCopyLink');
+
+    titleEl.textContent = info.title || info.artist || 'Untitled';
+    artistEl.textContent = info.artist || '';
+    pageTitle.textContent = info.title ? `${info.title} — ${info.artist}` : 'Riff';
+
+    const songTitle = info.title || 'Untitled';
+    const songArtist = info.artist || 'Unknown Artist';
+    const ogTitle = document.getElementById('ogTitle');
+    const ogDesc = document.getElementById('ogDesc');
+    const twTitle = document.getElementById('twTitle');
+    const twDesc = document.getElementById('twDesc');
+    if (ogTitle) ogTitle.content = songTitle;
+    if (twTitle) twTitle.content = songTitle;
+    if (ogDesc) ogDesc.content = songArtist ? `${songArtist} • Riff` : 'Listen on Riff';
+    if (twDesc) twDesc.content = songArtist ? `${songArtist} • Riff` : 'Listen on Riff';
+
+    if (info.duration > 0) {
+      durTimeEl.textContent = fmtTime(info.duration);
+      seekSlider.max = info.duration;
+    }
+
+    function updBar(sl, wrap) {
+      const min = parseFloat(sl.min) || 0;
+      const max = parseFloat(sl.max) || 100;
+      const val = parseFloat(sl.value) || 0;
+      const r = max > min ? Math.max(0, Math.min(1, (val - min) / (max - min))) : 0;
+      wrap.style.setProperty('--v', r.toFixed(4));
+    }
+
+    updBar(seekSlider, seekWrap);
+    updBar(volSlider, volWrap);
+
+    let lrcData = [];
+    let lrcIdx = -1;
+
+    function parseLrc(txt) {
+      if (!txt) return [];
+      const lines = txt.split('\n');
+      const out = [];
+      const re = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
+      for (const raw of lines) {
+        const matches = [...raw.matchAll(re)];
+        const text = raw.replace(re, '').trim();
+        if (!text && matches.length === 0) continue;
+        for (const m of matches) {
+          const min = parseInt(m[1], 10);
+          const sec = parseInt(m[2], 10);
+          const ms = m[3] ? (m[3].length === 2 ? parseInt(m[3], 10) * 10 : parseInt(m[3], 10)) : 0;
+          out.push({ t: min * 60 + sec + ms / 1000, s: text });
+        }
+      }
+      out.sort((a, b) => a.t - b.t);
+      return out;
+    }
+
+    function renderLrc() {
+      lrcContainer.innerHTML = '';
+      if (!lrcData.length) return;
+      btnLyrics.style.display = 'inline-flex';
+      lrcData.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'lyric-line';
+        div.textContent = item.s;
+        div.style.setProperty('--dist', 0);
+        div.addEventListener('click', () => {
+          if (item.t >= 0) seekTo(item.t);
+        });
+        lrcContainer.appendChild(div);
+      });
+    }
+
+    function syncLrc(c) {
+      if (!lrcData.length || lrcData[0].t < 0) return;
+      let nextIdx = -1;
+      for (let i = 0; i < lrcData.length; i++) {
+        if (c >= lrcData[i].t) nextIdx = i;
+        else break;
+      }
+      if (nextIdx === lrcIdx) return;
+      lrcIdx = nextIdx;
+      const lines = lrcContainer.children;
+      for (let i = 0; i < lines.length; i++) {
+        const d = lrcIdx === -1 ? 0 : Math.abs(i - lrcIdx);
+        lines[i].style.setProperty('--dist', d);
+        if (i === lrcIdx) lines[i].classList.add('active');
+        else lines[i].classList.remove('active');
+      }
+      if (lrcIdx >= 0 && lines[lrcIdx]) {
+        const target = lines[lrcIdx];
+        const top = target.offsetTop - lrcContainer.clientHeight / 2 + target.clientHeight / 2;
+        lrcContainer.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+
+    async function fetchLrc() {
+      const t = info.title;
+      const a = info.artist;
+      if (!t && !a) return;
+      const dur = info.duration ? `&duration=${info.duration}` : '';
+      try {
+        let r = await fetch(`https://lrclib.net/api/get?track_name=${encodeURIComponent(t)}&artist_name=${encodeURIComponent(a)}${dur}`);
+        let d = r.ok ? await r.json() : null;
+        if (!d || (!d.syncedLyrics && !d.plainLyrics)) {
+          r = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent((a + ' ' + t).trim())}`);
+          if (r.ok) {
+            const list = await r.json();
+            if (Array.isArray(list) && list.length) {
+              d = list.find((x) => x.syncedLyrics) || list[0];
+            }
+          }
+        }
+        if (d && (d.syncedLyrics || d.plainLyrics)) {
+          if (d.syncedLyrics) {
+            lrcData = parseLrc(d.syncedLyrics);
+          } else {
+            lrcData = d.plainLyrics.split('\n').filter(Boolean).map((s) => ({ t: -1, s: s.trim() }));
+          }
+          renderLrc();
+        }
+      } catch {}
+    }
+
+    fetchLrc();
+
+    btnLyrics.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const on = mainWrap.classList.toggle('show-lyrics');
+      btnLyrics.classList.toggle('active', on);
+      if (on && lrcIdx >= 0 && lrcContainer.children[lrcIdx]) {
+        setTimeout(() => {
+          const target = lrcContainer.children[lrcIdx];
+          const top = target.offsetTop - lrcContainer.clientHeight / 2 + target.clientHeight / 2;
+          lrcContainer.scrollTo({ top, behavior: 'smooth' });
+        }, 100);
+      }
+    });
+
+    const canvas = document.getElementById('m3CoverCanvas');
+    const dpr = window.devicePixelRatio || 1;
+    const SZ = 480;
+    canvas.width = SZ * dpr;
+    canvas.height = SZ * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    let coverImg = null;
+    let imgOk = false;
+
+    function loadProxy(proxyUrl, rawUrl) {
+      const pImg = new Image();
+      pImg.crossOrigin = 'Anonymous';
+      pImg.onload = () => {
+        coverImg = pImg;
+        imgOk = true;
+        getColors(pImg);
+      };
+      pImg.onerror = () => {
+        if (!rawUrl) return;
+        const fallback = new Image();
+        fallback.onload = () => {
+          coverImg = fallback;
+          imgOk = true;
+        };
+        fallback.src = rawUrl;
+      };
+      pImg.src = proxyUrl;
+    }
+
+    function loadCover(url) {
+      if (!url) return;
+      genOg(url);
+      const proxy = `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=600&h=600&fit=cover&output=jpg`;
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        coverImg = img;
+        imgOk = true;
+        if (!getColors(img)) loadProxy(proxy, url);
+      };
+      img.onerror = () => loadProxy(proxy, url);
+      img.src = url;
+    }
+
+    function initCover() {
+      if (info.image) {
+        loadCover(info.image);
+        return;
+      }
+      const yt = (info.mediaUrl || '').match(/(?:v=|\/embed\/|\/watch\/|youtu\.be\/|\/v\/)([a-zA-Z0-9_-]{11})/);
+      if (yt) {
+        loadCover(`https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`);
+        return;
+      }
+      const q = `${info.artist} ${info.title}`.trim();
+      if (q) {
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`)
+          .then((r) => r.json())
+          .then((d) => {
+            const hit = d.results && d.results[0];
+            if (hit && hit.artworkUrl100) loadCover(hit.artworkUrl100.replace('100x100', '600x600'));
+          })
+          .catch(() => {});
+      }
+    }
+
+    initCover();
+
+    const st = { from: 0, to: 0, start: 0, rot: 0, phase: 0, last: 0 };
+
+    function curShape(now) {
+      const S = window.RiffShapes;
+      if (!S || !S.ready()) return null;
+      if (!st.start) st.start = now;
+      if (now - st.start >= S.HOLD_MS) {
+        st.from = st.to;
+        st.to = S.next(st.from);
+        st.start = now;
+      }
+      const t = Math.min(1, (now - st.start) / S.MORPH_MS);
+      return { a: S.profile(st.from), b: S.profile(st.to), e: S.ease(t) };
+    }
+
+    function drawLoop(now) {
+      const S = window.RiffShapes;
+      if (!ctx || !S) return;
+
+      if (!st.last) st.last = now;
+      const dt = Math.min(48, Math.max(0, now - st.last));
+      st.last = now;
+
+      st.rot = (st.rot + (isPlaying ? 0.00045 : 0.00012) * dt) % (Math.PI * 2);
+      if (isPlaying) st.phase += 0.006 * dt;
+
+      const sh = curShape(now);
+      if (!sh) return;
+
+      const K = S.K;
+      const cx = SZ / 2, cy = SZ / 2;
+      const box = 330;
+      const sc = (box / 2) / 160;
+      const rot = st.rot;
+
+      function radAt(ang) {
+        const f = ((ang + Math.PI) / (Math.PI * 2)) * K;
+        const i0 = ((Math.floor(f) % K) + K) % K;
+        const i1 = (i0 + 1) % K;
+        const w = f - Math.floor(f);
+        const r0 = sh.a[i0] + (sh.b[i0] - sh.a[i0]) * sh.e;
+        const r1 = sh.a[i1] + (sh.b[i1] - sh.a[i1]) * sh.e;
+        return (r0 + (r1 - r0) * w) * sc;
+      }
+
+      ctx.clearRect(0, 0, SZ, SZ);
+
+      ctx.save();
+      ctx.beginPath();
+      for (let k = 0; k <= K; k++) {
+        const th = -Math.PI + (Math.PI * 2 * (k % K)) / K;
+        const r = radAt(th);
+        const x = cx + Math.cos(th + rot) * r;
+        const y = cy + Math.sin(th + rot) * r;
+        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.clip();
+
+      if (imgOk && coverImg) {
+        const iw = coverImg.naturalWidth || 300;
+        const ih = coverImg.naturalHeight || 300;
+        const side = Math.min(iw, ih);
+        const tSide = Math.ceil(box * 1.08);
+        ctx.drawImage(coverImg, (iw - side) / 2, (ih - side) / 2, side, side, cx - tSide / 2, cy - tSide / 2, tSide, tSide);
+      } else {
+        ctx.fillStyle = '#2b2930';
+        ctx.fillRect(0, 0, SZ, SZ);
+      }
+      ctx.restore();
+
+      const dur = parseFloat(seekSlider.max) || 100;
+      const pos = parseFloat(seekSlider.value) || 0;
+      const prog = dur > 0 ? Math.min(1, Math.max(0, pos / dur)) : 0;
+      const col = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#d0bcff';
+
+      const N = 220, gap = 16, lw = 4;
+      const ringPt = (phi, wv) => {
+        const r = radAt(phi - rot) + gap + lw / 2 + wv;
+        return [cx + Math.cos(phi) * r, cy + Math.sin(phi) * r];
+      };
+
+      const p0 = -Math.PI / 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = lw;
+      ctx.strokeStyle = col;
+
+      ctx.setLineDash([0.1, 7.5]);
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath();
+      const sFrom = Math.round(prog * N);
+      for (let s = sFrom; s <= N; s++) {
+        const [x, y] = ringPt(p0 + (Math.PI * 2 * s) / N, 0);
+        if (s === sFrom) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+      if (prog > 0) {
+        ctx.beginPath();
+        const pSteps = Math.max(2, Math.round(prog * N));
+        for (let s = 0; s <= pSteps; s++) {
+          const phi = p0 + (Math.PI * 2 * s) / N;
+          const wv = isPlaying ? Math.sin(phi * 24 + st.phase) * 1.8 : 0;
+          const [x, y] = ringPt(phi, wv);
+          if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(drawLoop);
+    }
+
+    requestAnimationFrame(drawLoop);
+
+    let isPlaying = false;
+    let dragging = false;
+    let ytPlayer = null;
+    let useYt = false;
+    let ytReady = false;
+
+    function getYtId(u) {
+      if (!u) return '';
+      const m = u.match(/(?:v=|\/embed\/|\/watch\/|youtu\.be\/|\/v\/|^)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    const ytId = getYtId(info.mediaUrl);
+
+    window.onYouTubeIframeAPIReady = function () {
+      if (!ytId) return;
+      ytPlayer = new YT.Player('youtubePlayerHost', {
+        height: '1',
+        width: '1',
+        videoId: ytId,
+        playerVars: { playsinline: 1, controls: 0, disablekb: 1, fs: 0 },
+        events: {
+          onReady: () => { ytReady = true; },
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.BUFFERING) {
+              setBtn('loading');
+            } else if (e.data === YT.PlayerState.PLAYING) {
+              setBtn('playing');
+              const d = ytPlayer.getDuration();
+              if (d > 0) {
+                seekSlider.max = Math.round(d);
+                durTimeEl.textContent = fmtTime(d);
+              }
+            } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+              setBtn('paused');
+            }
+          }
+        }
+      });
+    };
+
+    function setBtn(state) {
+      if (state === 'loading') {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'none';
+        spinIcon.style.display = 'block';
+        btnPlay.classList.remove('playing');
+        return;
+      }
+      spinIcon.style.display = 'none';
+      if (state === 'playing') {
+        isPlaying = true;
+        btnPlay.classList.add('playing');
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      } else {
+        isPlaying = false;
+        btnPlay.classList.remove('playing');
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
+    }
+
+    function goYt() {
+      if (ytPlayer && ytReady) {
+        useYt = true;
+        ytPlayer.playVideo();
+      } else if (ytId) {
+        setTimeout(startPlay, 300);
+      }
+    }
+
+    function startPlay() {
+      setBtn('loading');
+      if (info.streamUrl) {
+        useYt = false;
+        if (!audio.src) audio.src = info.streamUrl;
+        audio.play().then(() => setBtn('playing')).catch(() => goYt());
+      } else {
+        goYt();
+      }
+    }
+
+    function stopPlay() {
+      if (useYt && ytPlayer) ytPlayer.pauseVideo();
+      else audio.pause();
+      setBtn('paused');
+    }
+
+    function togglePlay() {
+      if (isPlaying) stopPlay();
+      else startPlay();
+    }
+
+    function seekTo(t) {
+      if (useYt && ytPlayer) ytPlayer.seekTo(t, true);
+      else audio.currentTime = t;
+      seekSlider.value = Math.round(t);
+      curTimeEl.textContent = fmtTime(t);
+      updBar(seekSlider, seekWrap);
+      syncLrc(t);
+    }
+
+    btnPlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePlay();
+    });
+
+    audio.addEventListener('waiting', () => { if (isPlaying) setBtn('loading'); });
+    audio.addEventListener('playing', () => setBtn('playing'));
+    audio.addEventListener('pause', () => setBtn('paused'));
+    audio.addEventListener('ended', () => setBtn('paused'));
+    audio.addEventListener('error', () => goYt());
+
+    audio.addEventListener('timeupdate', () => {
+      if (dragging || useYt) return;
+      const c = audio.currentTime;
+      const d = audio.duration;
+      curTimeEl.textContent = fmtTime(c);
+      if (d > 0) {
+        seekSlider.value = Math.round(c);
+        seekSlider.max = Math.round(d);
+        durTimeEl.textContent = fmtTime(d);
+      }
+      updBar(seekSlider, seekWrap);
+      syncLrc(c);
+    });
+
+    setInterval(() => {
+      if (!isPlaying || !useYt || !ytPlayer || dragging) return;
+      try {
+        const c = ytPlayer.getCurrentTime();
+        const d = ytPlayer.getDuration();
+        curTimeEl.textContent = fmtTime(c);
+        if (d > 0) {
+          seekSlider.value = Math.round(c);
+          seekSlider.max = Math.round(d);
+          durTimeEl.textContent = fmtTime(d);
+        }
+        updBar(seekSlider, seekWrap);
+        syncLrc(c);
+      } catch {}
+    }, 350);
+
+    seekSlider.addEventListener('input', () => {
+      dragging = true;
+      curTimeEl.textContent = fmtTime(parseFloat(seekSlider.value));
+      updBar(seekSlider, seekWrap);
+    });
+
+    seekSlider.addEventListener('change', () => {
+      dragging = false;
+      seekTo(parseFloat(seekSlider.value));
+    });
+
+    volSlider.addEventListener('input', () => {
+      const v = parseFloat(volSlider.value);
+      audio.volume = v;
+      if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(Math.round(v * 100));
+      updBar(volSlider, volWrap);
+    });
+
+    let lastVol = 0.9;
+    btnMute.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (volSlider.value > 0) {
+        lastVol = volSlider.value;
+        volSlider.value = 0;
+      } else {
+        volSlider.value = lastVol;
+      }
+      volSlider.dispatchEvent(new Event('input'));
+    });
+
+    btnCopy.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const old = titleEl.textContent;
+        titleEl.textContent = 'Link copied!';
+        setTimeout(() => { titleEl.textContent = old; }, 1200);
+      });
+    });
+  </script>
+</body>
+</html>
